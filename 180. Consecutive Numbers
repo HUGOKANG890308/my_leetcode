@@ -1,0 +1,69 @@
+import pandas as pd
+## ------Sliding window using 2 pointers  leetcode大神------
+
+def consecutive_numbers(logs: pd.DataFrame) -> pd.DataFrame:
+    nums = logs["num"]
+    consecutiveNums = set()
+    i = 0
+    while i < len(nums) - 2:
+        if nums[i] == nums[i+1] == nums[i+2]:
+            consecutiveNums.add(nums[i])
+            start = i
+            # 跳過整個連續序列
+            while i < len(nums) and nums[i] == nums[start]:
+                i += 1
+        else:
+            i += 1
+
+    return pd.DataFrame({"ConsecutiveNums": list(consecutiveNums)})
+
+
+
+
+
+
+
+## ------Sliding window using 2 pointers  chat------
+def consecutive_numbers(logs: pd.DataFrame) -> pd.DataFrame:
+    if logs.empty:
+        return pd.DataFrame({'ConsecutiveNums': []})
+    number = logs['num'].to_list()
+    ans = []
+    left = 0  # 初始化左指針
+    for right in range(1,len(number)):
+        if number[right] != number[left]:
+            if right - left >=3: # 檢查窗口大小是否至少為3
+                ans.append(number[left])
+            left = right # 移動左指針
+
+    # 檢查最後一組數字
+    if len(number) - left >= 3:
+        ans.append(number[left])
+
+    return pd.DataFrame({'ConsecutiveNums': ans}) 
+
+
+
+
+## ------自己想的簡單版 ------
+def consecutive_numbers(logs: pd.DataFrame) -> pd.DataFrame:
+    number = logs['num'].to_list()
+    ans = []
+    if len(number) == 0:
+        return pd.DataFrame({'ConsecutiveNums':ans})
+    count = 1
+
+    for i in range(1,len(number)):
+        if number[i] == number[i-1]:
+            count += 1
+        else:
+            if count >=3 :
+                if number[i-1] not in ans:
+                    ans.append(number[i-1])
+            count = 1
+            
+        # 檢查是否到達列表末尾並處理最後一組數字
+        if  i == len(number) - 1 and count >= 3 and number[i] not in ans:
+            ans.append(number[i])
+    
+    return pd.DataFrame({'ConsecutiveNums':ans})
