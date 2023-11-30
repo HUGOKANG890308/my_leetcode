@@ -1,5 +1,27 @@
 import pandas as pd
 
+# ------ 法I ------
+#比較難的解法使用 apply 技巧檢索每個rows
+def find_manager_name(row, df):
+    manager_name = df[df['id'] == row['managerId']]['name']
+    # 確保返回一個單一值。如果找不到匹配的經理，可以返回 None 或適當的預設值
+    return manager_name.iloc[0] if not manager_name.empty else None
+def find_manager_salary(row,df):
+    manager_salary = df[df['id'] == row['managerId']]['salary']
+    return manager_salary.iloc[0] if not manager_salary.empty else None
+
+def find_employees(employee: pd.DataFrame) -> pd.DataFrame:
+    # 新增一列 'manager_name'，其中包含每個員工的經理名字
+    employee['manager_name'] = employee.apply(find_manager_name, df=employee, axis=1)
+    employee['manager_salary'] = employee.apply(find_manager_salary, df=employee, axis=1)
+    # 確保 manager_salary 沒有 None 值
+    employee = employee.dropna()
+    employee = employee[employee['salary'] > employee['manager_salary']]
+    employee = employee.rename(columns={'name': 'Employee'})
+    
+    return pd.DataFrame(employee['Employee'])
+
+# ------ 法II ------
 def find_employees(employee: pd.DataFrame) -> pd.DataFrame:
     # 自我合併
     # 這樣做的目的是將每個員工的資訊和他們經理的資訊放在同一行中。
